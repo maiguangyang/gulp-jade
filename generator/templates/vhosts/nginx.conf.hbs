@@ -1,0 +1,23 @@
+{{#each modules}}
+  {{#compare 'domain' '===' type}}
+    server {
+      listen 80;
+      server_name {{{domain domain}}};
+      root {{{domain dist}}};
+
+      access_log {{ ../logsDir }}/access.log combined buffer=16k flush=5s;
+      error_log {{ ../logsDir }}/error.log error;
+
+      error_page 404 500 502 503 504 @fallback;
+
+      location / {
+        index  index.html index.htm;
+      }
+
+      location @fallback {
+        try_files /error.html =500;
+      }
+    }
+  {{/compare}}
+
+{{/each}}

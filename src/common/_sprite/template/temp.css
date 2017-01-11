@@ -1,0 +1,16 @@
+.sp {
+  position: relative;
+  display: inline-block;
+}
+
+{{#sprites}}
+.sp-{{name}}:before {
+  display: inline-block;
+  content: ' ';
+  background-image: url({{{escaped_image}}});
+  background-position: {{px.offset_x}} {{px.offset_y}};
+  width: {{px.width}};
+  height: {{px.height}};
+  vertical-align: middle;
+}
+{{/sprites}}

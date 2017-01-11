@@ -1,0 +1,41 @@
+{
+  "name": "test-web",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "gulpfile.babel.js",
+  "scripts": {
+    "nginx": "babel-node ./generator/vhosts"
+  },
+  "author": "guangyang.mai",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.21.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "del": "^2.2.2",
+    "eslint": "^3.12.2",
+    "fs-extra": "^1.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat-dir": "^1.0.0",
+    "gulp-hash": "^3.1.0",
+    "gulp-if": "^2.0.2",
+    "gulp-imagemin": "^3.1.1",
+    "gulp-jade": "^1.1.0",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-minify-html": "^1.0.6",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-rev-replace": "^0.4.3",
+    "gulp-sass": "^2.3.2",
+    "gulp-uglify": "^1.5.4",
+    "gulp.spritesmith": "^6.2.1",
+    "handlebars": "^4.0.6",
+    "lodash": "^4.17.4",
+    "merge-stream": "^1.0.1",
+    "minimist": "^1.2.0",
+    "path": "^0.12.7",
+    "vinyl-buffer": "^1.0.0"
+  }
+}
