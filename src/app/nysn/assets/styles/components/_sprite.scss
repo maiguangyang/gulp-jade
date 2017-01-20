@@ -1,0 +1,14 @@
+.sp {
+  position: relative;
+  display: inline-block;
+}
+
+.sp-icon-captcha:before {
+  display: inline-block;
+  content: ' ';
+  background-image: url(../images/_sprites/sprite.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 20px;
+  vertical-align: middle;
+}

@@ -27,6 +27,7 @@ export const proTips = '请输入项目名（项目文件夹名）：gulp task -
 export const paths = {
   src       : `${ROOT_PATH}src/app/${options.name}`,
   dist      : `${ROOT_PATH}dist/${options.name}`,
+  common    : `${ROOT_PATH}src/common/`,
   fileName  : 'version.json',
 }
 

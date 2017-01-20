@@ -4,7 +4,8 @@
   "description": "test",
   "main": "gulpfile.babel.js",
   "scripts": {
-    "nginx": "babel-node ./generator/vhosts"
+    "nginx": "babel-node ./generator/vhosts",
+    "libs": "gulp libs --name nysn"
   },
   "author": "guangyang.mai",
   "license": "ISC",
@@ -14,9 +15,7 @@
     "babel-preset-stage-0": "^6.16.0",
     "del": "^2.2.2",
     "eslint": "^3.12.2",
-    "fs-extra": "^1.0.0",
     "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
     "gulp-concat-dir": "^1.0.0",
     "gulp-hash": "^3.1.0",
     "gulp-if": "^2.0.2",
@@ -37,5 +36,9 @@
     "minimist": "^1.2.0",
     "path": "^0.12.7",
     "vinyl-buffer": "^1.0.0"
+  },
+  "devDependencies": {
+    "fs": "0.0.1-security",
+    "gulp-babel": "^6.1.2"
   }
 }
