@@ -9,6 +9,7 @@ import del          from  'del'                 //- 删除
 import revReplace   from  'gulp-rev-replace'    //- 路径替换
 import minifycss    from  'gulp-minify-css'     //- 压缩CSS
 import minifyHTML   from  'gulp-minify-html'    //- 压缩HTML
+import handlebars   from  'gulp-compile-handlebars'
 
 import babel        from  'gulp-babel'          //- ES6
 import uglify       from  'gulp-uglify'         //- JS压缩
@@ -183,11 +184,22 @@ gulp.task('scripts', () => {
  */
 
 gulp.task('config', () => {
-  let manifest = JSON.parse(fs.readFileSync(`${paths.dist}/${paths.fileName}`), 'utf8');
-  let fileUrl  = `${outputPath.scripts}/${manifest['config.js']}`;
-  // let fileRev  = JSON.parse(fs.readFileSync(`${outputPath.scripts}/${manifest['config.js']}`), 'utf8');
+
+  del([`${outputPath.scripts}`], {force: true});
+
+  let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
+  gulp.src([`${inputPath.common}/scripts/config.js`])
+  .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
+  .pipe(handlebars('.js', ''))
+  .pipe(rename('config.js'))
+  .pipe(hash())
+  .pipe(gulp.dest(`${outputPath.scripts}/`))
+
+
+  // let manifest = JSON.parse(fs.readFileSync(`${paths.dist}/${paths.fileName}`), 'utf8');
+  // let fileUrl  = `${outputPath.scripts}/${manifest['config.js']}`;
+  // let fileRev  = fs.readFileSync(`${outputPath.scripts}/${manifest['config.js']}`);
   // console.log(manifest['config.js'], fileRev);
-  console.log(manifest);
 
   // console.log(`${paths.dist}/${paths.fileName}`);
   // if (_.isEmpty(options.name)) {console.log(proTips); return false;};
