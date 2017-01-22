@@ -6,6 +6,7 @@ require.config({
     'jquery'  : './assets/scripts/libs/jquery.min',
     'cookie'  : './assets/scripts/libs/jquery.cookie',
 
+    'index'   : './assets/scripts/index.js',
     'test'   : './assets/scripts/test.js',
   }
 });

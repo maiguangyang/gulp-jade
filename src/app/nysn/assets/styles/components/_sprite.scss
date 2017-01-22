@@ -7,8 +7,17 @@
   display: inline-block;
   content: ' ';
   background-image: url(../images/_sprites/sprite.png);
-  background-position: 0px 0px;
+  background-position: 0px -27px;
   width: 24px;
   height: 20px;
+  vertical-align: middle;
+}
+.sp-icon-test:before {
+  display: inline-block;
+  content: ' ';
+  background-image: url(../images/_sprites/sprite.png);
+  background-position: 0px 0px;
+  width: 57px;
+  height: 22px;
   vertical-align: middle;
 }

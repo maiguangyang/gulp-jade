@@ -9,7 +9,6 @@ import del          from  'del'                 //- 删除
 import revReplace   from  'gulp-rev-replace'    //- 路径替换
 import minifycss    from  'gulp-minify-css'     //- 压缩CSS
 import minifyHTML   from  'gulp-minify-html'    //- 压缩HTML
-import handlebars   from  'gulp-compile-handlebars'
 
 import babel        from  'gulp-babel'          //- ES6
 import uglify       from  'gulp-uglify'         //- JS压缩
@@ -48,53 +47,19 @@ let getVersion = (func) => {
  * 压缩jade
  */
 
-gulp.task('jade', ['styles', 'scripts'], () => {
+gulp.task('jade', ['static'], () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-  let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
-  return gulp.src([`${inputPath.files}/*.jade`])                      //- 读取需要替换的html
-  .pipe(jade({pretty: '\t'}))
-  .pipe(plumber())
-  .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
-  .pipe(getVersion(minifyHTML({comments:true, spare:true})))          //- master环境压缩文件
-  .pipe(gulp.dest(`${outputPath.files}`));                            //- 替换后的文件输出的目录
-
-});
-
-/**
- * 压缩Html
- */
-
-gulp.task('html', ['styles', 'scripts'], () => {
-  if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-
-  let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
-  return gulp.src([`${inputPath.files}/**/*.html`])                   //- 读取需要替换的html
-  .pipe(plumber())
-  .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
-  .pipe(getVersion(minifyHTML({comments:true, spare:true})))          //- master环境压缩文件
-  .pipe(gulp.dest(`${outputPath.files}`));                            //- 替换后的文件输出的目录
-})
+  setTimeout(function () {
+    let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
+    return gulp.src([`${inputPath.files}/*.jade`])                      //- 读取需要替换的html
+    .pipe(jade({pretty: '\t'}))
+    .pipe(plumber())
+    .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
+    .pipe(getVersion(minifyHTML({comments:true, spare:true})))          //- master环境压缩文件
+    .pipe(gulp.dest(`${outputPath.files}`));                            //- 替换后的文件输出的目录
+  }, 500);
 
 
-/**
- * 复制common/libs目录文件到项目目录
- */
-
-gulp.task('libs', () => {
-
-  if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-  gulp.src([`${paths.common}/scripts/libs/*.js`])
-  .pipe(gulp.dest(`${outputPath.scripts}/libs/`));
-
-});
-
-/**
- * 删除当前项目历史文件
- */
-
-gulp.task('del', () => {
-  if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-  del([`${paths.dist}`], {force: true});
 });
 
 
@@ -106,7 +71,7 @@ gulp.task('del', () => {
  */
 gulp.task('styles', () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-
+  del([`${outputPath.styles}/*.css`], {force: true});
   return gulp.src(`${inputPath.styles}/*.scss`)
     .pipe(plumber())
     .pipe(concat({ext:'.css'}))                         //- 根据文件/文件夹名合并
@@ -122,26 +87,28 @@ gulp.task('styles', () => {
 
 
 /**
- * 编译JS
+ * 合并JS
  * @param  {string} 'styles'  任务名称
  * @param  {[type]} clean     调用回调函数
  * @return {[type]}
  */
-gulp.task('scripts', () => {
+gulp.task('mergejs', () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
+  del([`${outputPath.scripts}/*.js`], {force: true});
 
-  del([`${outputPath.scripts}`], {force: true});
   let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
 
   gulp.src(`${inputPath.scripts}/*.js`)
     .pipe(plumber())
     .pipe(revReplace({manifest: manifest}))                           //- 执行文件内路径替换
     .pipe(concat({ext:'.js'}));                                       //- 根据文件/文件夹名合并
+})
 
-  /**
-   * 编译babel的时候，需要延迟一下
-   */
-  setTimeout(function () {
+/**
+ * js babel编译
+ */
+gulp.task('scripts', ['mergejs'], () => {
+
     gulp.src(`${inputPath.scripts}/*.js`)
     .pipe(babel())                                                    //- 编译ES6
     .pipe(hash())                                                     //- 文件名加MD5后缀
@@ -162,7 +129,8 @@ gulp.task('scripts', () => {
     /**
      * require config配置文件
      */
-    setTimeout(function () {
+
+     setTimeout(function () {
       let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
       gulp.src([`${inputPath.common}/scripts/config.js`])
       .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
@@ -170,56 +138,28 @@ gulp.task('scripts', () => {
       .pipe(gulp.dest(`${outputPath.scripts}/`))
       .pipe(hash.manifest(`${paths.fileName}`))                         //- JSON版本号
       .pipe(gulp.dest(`${paths.dist}`))                                 //- 输出版本号JSON文件
-    }, 1000);
 
 
-  }, 500);
 
+      /**
+       * 替换require里面带.js后缀
+      */
 
-});
+      setTimeout(function () {
+        let requireFile = JSON.parse(fs.readFileSync(`${paths.dist}/${paths.fileName}`), 'utf8');
+        let fileUrl     = `${outputPath.scripts}/${requireFile['config.js']}`;
 
+        let fileRev     = fs.readFile(fileUrl, 'UTF-8', function (err, res) {
+          let data = res.replace(/.js/gi, '');
+          fs.writeFile(fileUrl, data, 'utf8', (err) => {
+            if (err) throw err;
+          });
+        });
 
-/**
- * 压缩_require config
- */
+      }, 500);
 
-gulp.task('config', () => {
+     }, 500);
 
-  del([`${outputPath.scripts}`], {force: true});
-
-  let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
-  gulp.src([`${inputPath.common}/scripts/config.js`])
-  .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
-  .pipe(handlebars('.js', ''))
-  .pipe(rename('config.js'))
-  .pipe(hash())
-  .pipe(gulp.dest(`${outputPath.scripts}/`))
-
-
-  // let manifest = JSON.parse(fs.readFileSync(`${paths.dist}/${paths.fileName}`), 'utf8');
-  // let fileUrl  = `${outputPath.scripts}/${manifest['config.js']}`;
-  // let fileRev  = fs.readFileSync(`${outputPath.scripts}/${manifest['config.js']}`);
-  // console.log(manifest['config.js'], fileRev);
-
-  // console.log(`${paths.dist}/${paths.fileName}`);
-  // if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-  // let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
-  // return gulp.src([`${paths.src}/_require/config.js`])                //- 读取config
-  // .pipe(plumber())
-  // .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
-  // .pipe(gulp.dest(`${inputPath.scripts}`));                           //- 替换后的文件输出的目录
-});
-
-
-/**
- * 压缩图片
- */
-gulp.task('miniimg', () => {
-  if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-  return gulp.src(inputPath.images + '/*')
-  .pipe(plumber())
-  .pipe(imagemin())
-  .pipe(gulp.dest(`${outputPath.images}`))
 });
 
 
@@ -241,11 +181,22 @@ gulp.task('sprite', () => {
 
 });
 
+
+/**
+ * 复制common/libs目录文件到项目目录
+ */
+
+gulp.task('libs', () => {
+  if (_.isEmpty(options.name)) {console.log(proTips); return false;};
+  gulp.src([`${paths.common}/scripts/libs/*.js`])
+  .pipe(gulp.dest(`${outputPath.scripts}/libs/`));
+
+});
+
 /**
  * 复制精灵图、图片
  */
-gulp.task('move', ['libs'], () => {
-  setTimeout(() => {
+gulp.task('move', ['sprite', 'libs'], () => {
 
     gulp.src([`${inputPath.scripts}/libs/*.js`])
     .pipe(gulp.dest(`${outputPath.scripts}/libs/`));
@@ -256,24 +207,36 @@ gulp.task('move', ['libs'], () => {
     gulp.src([`${inputPath.images}/*.png`, `${inputPath.images}/*.jpg`])
     .pipe(gulp.dest(`${outputPath.images}`));
 
-  }, 1000)
-
 });
 
-gulp.task('dels', () => {
-  del([`${inputPath.styles}/components/assets`], {force: true});
+
+/**
+ * 删除当前项目历史文件
+ */
+
+gulp.task('del', () => {
+  if (_.isEmpty(options.name)) {console.log(proTips); return false;};
+  del([`${paths.dist}`], {force: true});
+  // del([`${inputPath.styles}/components/assets`], {force: true});
+});
+
+
+
+/**
+ * 静态资源
+ */
+gulp.task('static', ['styles', 'scripts'], () => {
+  console.log('static compile complete');
 });
 
 
 /**
  * 默认任务
  */
-gulp.task('default', ['sprite', 'del', 'styles', 'scripts', 'move', 'jade'], () => {
+gulp.task('default', ['move', 'jade'], () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
   gulp.watch(`${inputPath.styles}/**/*.scss`, ['jade']);
   gulp.watch(`${inputPath.scripts}/*.js`, ['jade']);
-  // gulp.watch(`${inputPath.files}/**/*.html`, ['html']);
   gulp.watch(`${inputPath.files}/**/*.jade`, ['jade']);
-  // gulp.watch(`${paths.src}/_require/config.js`, ['rjs', 'html']);
 
 });
