@@ -39,6 +39,8 @@ import {
 
   }  from  './path'
 
+import {requireWriteFile} from './func'
+
 let getVersion = (func) => {
   return gulpif(options.env === 'master', func)
 }
@@ -57,8 +59,7 @@ gulp.task('jade', ['static'], () => {
     .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
     .pipe(getVersion(minifyHTML({comments:true, spare:true})))          //- master环境压缩文件
     .pipe(gulp.dest(`${outputPath.files}`));                            //- 替换后的文件输出的目录
-  }, 500);
-
+  }, 1000);
 
 });
 
@@ -129,36 +130,9 @@ gulp.task('scripts', ['mergejs'], () => {
     /**
      * require config配置文件
      */
-
-     setTimeout(function () {
-      let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
-      gulp.src([`${inputPath.common}/scripts/config.js`])
-      .pipe(revReplace({manifest: manifest}))                             //- 执行文件内路径替换
-      .pipe(hash())
-      .pipe(gulp.dest(`${outputPath.scripts}/`))
-      .pipe(hash.manifest(`${paths.fileName}`))                         //- JSON版本号
-      .pipe(gulp.dest(`${paths.dist}`))                                 //- 输出版本号JSON文件
-
-
-
-      /**
-       * 替换require里面带.js后缀
-      */
-
-      setTimeout(function () {
-        let requireFile = JSON.parse(fs.readFileSync(`${paths.dist}/${paths.fileName}`), 'utf8');
-        let fileUrl     = `${outputPath.scripts}/${requireFile['config.js']}`;
-
-        let fileRev     = fs.readFile(fileUrl, 'UTF-8', function (err, res) {
-          let data = res.replace(/.js/gi, '');
-          fs.writeFile(fileUrl, data, 'utf8', (err) => {
-            if (err) throw err;
-          });
-        });
-
-      }, 500);
-
-     }, 500);
+    setTimeout(function () {
+      requireWriteFile(outputPath.scripts);
+    }, 800);
 
 });
 

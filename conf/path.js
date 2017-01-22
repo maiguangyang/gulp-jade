@@ -61,5 +61,6 @@ export const outputPath = {
   images    :   `${paths.dist}/assets/images`,
   styles    :   `${paths.dist}/assets/styles`,
   scripts   :   `${paths.dist}/assets/scripts`,
+  require   :   `./assets/scripts`,
   files     :   `${paths.dist}`,
 }

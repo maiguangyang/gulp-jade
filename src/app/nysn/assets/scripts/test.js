@@ -1,13 +1,12 @@
-
-require(['jquery'], function($){
+define(function () {
   let test = {
     name : 'test',
     say () {
-      console.log('test Say1');
+      console.log('test Say2');
     },
   }
 
   return {
-    test : test,
+    test: test,
   }
 })
