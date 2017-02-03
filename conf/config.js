@@ -26,20 +26,19 @@ import minimist     from  'minimist'            //- 命令行参数解析
 
 import plumber      from  'gulp-plumber'        //监听错误
 import _            from  'lodash'              //lodash
-import fs           from  'fs'              //lodash
+import fs           from  'fs'
 
 import {
-    ROOT_PATH,
-    proTips,
-    paths,
-    inputPath,
-    outputPath,
-    options,
-    sprite,
+  ROOT_PATH,
+  proTips,
+  paths,
+  inputPath,
+  outputPath,
+  options,
+  sprite,
+}  from  './path'
 
-  }  from  './path'
-
-import {requireWriteFile} from './func'
+import { requireWriteFile } from './func'
 
 let getVersion = (func) => {
   return gulpif(options.env === 'master', func)
@@ -95,7 +94,7 @@ gulp.task('styles', () => {
  */
 gulp.task('mergejs', () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
-  del([`${outputPath.scripts}/*.js`], {force: true});
+  del([`${outputPath.scripts}/**/*.js`], {force: true});
 
   let manifest = gulp.src(`${paths.dist}/${paths.fileName}`)          //- hash版本文件
 
@@ -108,7 +107,7 @@ gulp.task('mergejs', () => {
 /**
  * js babel编译
  */
-gulp.task('scripts', ['mergejs'], () => {
+gulp.task('scripts', ['mergejs', 'libs'], () => {
 
     gulp.src(`${inputPath.scripts}/*.js`)
     .pipe(babel())                                                    //- 编译ES6
@@ -118,14 +117,6 @@ gulp.task('scripts', ['mergejs'], () => {
     .pipe(gulp.dest(`${outputPath.scripts}`))                         //- 输出编译后的JS文件
     .pipe(hash.manifest(`${paths.fileName}`))                         //- JSON版本号
     .pipe(gulp.dest(`${paths.dist}`))                                 //- 输出版本号JSON文件
-
-
-    /**
-     * 复制common/libs目录文件到项目目录
-     */
-    gulp.src([`${paths.common}/scripts/libs/*.js`])
-    .pipe(gulp.dest(`${outputPath.scripts}/libs/`));
-
 
     /**
      * require config配置文件
@@ -162,8 +153,23 @@ gulp.task('sprite', () => {
 
 gulp.task('libs', () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
+
+  gulp.src(`${paths.common}/scripts/*.js`)
+  .pipe(babel())                                                    //- 编译ES6
+  .pipe(hash())                                                     //- 文件名加MD5后缀
+  .pipe(getVersion(rename({suffix: '.min'})))                       //- master环境改名
+  .pipe(getVersion(uglify()))                                       //- master环境压缩
+  .pipe(gulp.dest(`${outputPath.scripts}/libs/`))                   //- 输出编译后的JS文件
+
   gulp.src([`${paths.common}/scripts/libs/*.js`])
   .pipe(gulp.dest(`${outputPath.scripts}/libs/`));
+
+
+  /**
+   * 复制全局css
+   */
+  gulp.src([`${paths.common}/styles/*.css`])
+  .pipe(gulp.dest(`${outputPath.styles}/libs/`));
 
 });
 
@@ -210,7 +216,7 @@ gulp.task('static', ['styles', 'scripts'], () => {
 gulp.task('default', ['move', 'jade'], () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
   gulp.watch(`${inputPath.styles}/**/*.scss`, ['jade']);
-  gulp.watch(`${inputPath.scripts}/*.js`, ['jade']);
+  gulp.watch([`${inputPath.scripts}/*.js`, `${paths.common}/scripts/*.js`], ['jade']);
   gulp.watch(`${inputPath.files}/**/*.jade`, ['jade']);
 
 });

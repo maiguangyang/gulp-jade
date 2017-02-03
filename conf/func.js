@@ -16,26 +16,63 @@ export let requireWriteFile = function (url) {
     let arr =  _.split(fileName, '-');
 
     if (0 < arr.length - 1) {
-      results[arr[arr.length - 2]] = `${outputPath.require}/${fileName}`;
+      results[arr[arr.length - 2].replace(/\./gi, '-')] = `${outputPath.require}/${fileName}`;
     }
     else if (0 > path.indexOf('.js')) {
 
       let libPath = fs.readdirSync(`${url}/${path}`);
 
       libPath.forEach(function (file) {
-        let fileName = file.replace(/.js/gi, '');
+        let fileName        = file.replace(/.js/gi, '');
+        let arr             =  _.split(fileName, '-');
+        let newFileNameArr  = _.split(fileName, '.');
+        let newFileName     = '';
 
-        results[fileName] = `${outputPath.require}/${path}/${fileName}` ;
+        /**
+         * 替换 - 后面第一个字母成大写
+         */
+        if (0 < newFileNameArr.length - 1) {
+          newFileName = `${newFileNameArr[newFileNameArr.length - 2]}${newFileNameArr[newFileNameArr.length - 1].substr(0, 1).toUpperCase()}${newFileNameArr[newFileNameArr.length - 1].substr(1)}`;
+        }
+
+        /**
+         * 输出
+         */
+        if (0 < arr.length - 1) {
+          if (0 >= newFileNameArr.length - 1) {
+            newFileName = arr[arr.length - 2].replace(/\./gi, '-');
+          }
+
+          results[newFileName] = `${outputPath.require}/${path}/${fileName}`;
+        }
+        else {
+          if (0 >= newFileNameArr.length - 1) {
+            newFileName = fileName.replace(/\./gi, '-');
+          }
+
+          results[newFileName] = `${outputPath.require}/${path}/${fileName}`;
+        }
+
       });
 
     }
+
   });
+
+
 
   let str = JSON.stringify(results);
 
-  results = `require.config({
-    paths : ${str},
-  });`;
+  str = str.replace(/,/gi, ',\r\n    ');
+  str = str.replace(/{/, '{\r\n    ');
+  str = str.replace(/}/, '\r\n  }');
+  str = str.replace(/"/gi, "'");
+
+
+
+results = `require.config({
+  paths : ${str},
+});`;
 
   let confPath = `${outputPath.scripts}/config.js`;
 

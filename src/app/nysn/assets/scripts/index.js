@@ -1,5 +1,5 @@
 
 require(['test'], (t) => {
-  window.test = t;
-  console.log('test');
-});
+  window.http = t;
+  console.log(t);
+})
