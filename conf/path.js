@@ -2,8 +2,8 @@
 import path       from 'path';
 import minimist   from  'minimist'          //- 命令行参数解析
 
-export const ROOT_PATH = path.join(__dirname, '../');
-export const MOVE_PATH = path.join(__dirname, './');
+export const ROOT_PATH = path.join(__dirname, '../').replace(/\\/gi, '/');
+export const MOVE_PATH = path.join(__dirname, './').replace(/\\/gi, '/');
 
 /**
  * [knownOptions description]     gulp task --env master

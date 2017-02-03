@@ -39,6 +39,6 @@
   },
   "devDependencies": {
     "fs": "0.0.1-security",
-    "gulp-babel": "^6.1.2",
+    "gulp-babel": "^6.1.2"
   }
 }

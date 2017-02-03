@@ -129,7 +129,7 @@ let datas  = MODULES
   return row;
 });
 
-let logsDir = path.join(ROOT_PATH, LOG_PATH);
+let logsDir = path.join(ROOT_PATH, LOG_PATH).replace(/\\/gi, '/');
 fs.ensureDirSync(logsDir);
 
 let source = fn({

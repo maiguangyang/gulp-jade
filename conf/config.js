@@ -164,13 +164,6 @@ gulp.task('libs', () => {
   gulp.src([`${paths.common}/scripts/libs/*.js`])
   .pipe(gulp.dest(`${outputPath.scripts}/libs/`));
 
-
-  /**
-   * 复制全局css
-   */
-  gulp.src([`${paths.common}/styles/*.css`])
-  .pipe(gulp.dest(`${outputPath.styles}/libs/`));
-
 });
 
 /**

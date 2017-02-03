@@ -25,30 +25,31 @@ export let requireWriteFile = function (url) {
       libPath.forEach(function (file) {
         let fileName        = file.replace(/.js/gi, '');
         let arr             =  _.split(fileName, '-');
-        let newFileNameArr  = _.split(fileName, '.');
+        // let newFileNameArr  = _.split(fileName, '.');
         let newFileName     = '';
 
         /**
          * 替换 - 后面第一个字母成大写
          */
-        if (0 < newFileNameArr.length - 1) {
-          newFileName = `${newFileNameArr[newFileNameArr.length - 2]}${newFileNameArr[newFileNameArr.length - 1].substr(0, 1).toUpperCase()}${newFileNameArr[newFileNameArr.length - 1].substr(1)}`;
-        }
+        // if (0 < newFileNameArr.length - 1) {
+        //   newFileName = `${newFileNameArr[newFileNameArr.length - 2]}${newFileNameArr[newFileNameArr.length - 1].substr(0, 1).toUpperCase()}${newFileNameArr[newFileNameArr.length - 1].substr(1)}`;
+        // }
 
         /**
          * 输出
          */
         if (0 < arr.length - 1) {
-          if (0 >= newFileNameArr.length - 1) {
+
+          // if (0 >= newFileNameArr.length - 1) {
             newFileName = arr[arr.length - 2].replace(/\./gi, '-');
-          }
+          // }
 
           results[newFileName] = `${outputPath.require}/${path}/${fileName}`;
         }
         else {
-          if (0 >= newFileNameArr.length - 1) {
+          // if (0 >= newFileNameArr.length - 1) {
             newFileName = fileName.replace(/\./gi, '-');
-          }
+          // }
 
           results[newFileName] = `${outputPath.require}/${path}/${fileName}`;
         }
@@ -68,7 +69,11 @@ export let requireWriteFile = function (url) {
   str = str.replace(/}/, '\r\n  }');
   str = str.replace(/"/gi, "'");
 
+  let shim = {};
 
+  shim.nprogress = {
+    deps: '',
+  }
 
 results = `require.config({
   paths : ${str},
