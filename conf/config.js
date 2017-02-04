@@ -209,7 +209,12 @@ gulp.task('static', ['styles', 'scripts'], () => {
 gulp.task('default', ['move', 'jade'], () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
   gulp.watch(`${inputPath.styles}/**/*.scss`, ['jade']);
-  gulp.watch([`${inputPath.scripts}/*.js`, `${paths.common}/scripts/*.js`], ['jade']);
+  gulp.watch(`${inputPath.common}/styles/*.scss`, ['jade']);
+  gulp.watch(`${paths.common}/styles/*.scss`, ['jade']);
+
+  gulp.watch(`${inputPath.scripts}/*.js`, ['jade']);
+  gulp.watch(`${inputPath.common}/scripts/*.js`, ['jade']);
+  gulp.watch(`${paths.common}/scripts/*.js`, ['jade']);
   gulp.watch(`${inputPath.files}/**/*.jade`, ['jade']);
 
 });

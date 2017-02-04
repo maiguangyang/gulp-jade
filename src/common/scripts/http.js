@@ -1,5 +1,5 @@
 
-define(['jquery'], ($) => {
+define(['jquery', 'message'], ($, createMessage) => {
 
   let count   = 3;
   let state   = false;
@@ -54,6 +54,7 @@ define(['jquery'], ($) => {
         return success ? success(res) : function () {};
       })
       .error((err, errType) => {
+        createMessage(err.statusText || '请求失败...', 'error', 3);
         reset(url, type, data, dataType, headers, timeout, success, errFunc);
       });
     }

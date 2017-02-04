@@ -16,6 +16,13 @@ html
           validate,
           name='username')
 
+
+    #messenger
+      .message.error
+        button(type='button', class='message-close') ×
+        .message-inner
+          | There was an explosion while processing your request.
+
     script(src='./assets/scripts/libs/require.js')
     script(src='./assets/scripts/config.js')
     script(src='./assets/scripts/index.js')
