@@ -14,14 +14,23 @@ html
       form.form
         input(required,
           validate,
-          name='username')
+          name='username',
+          pattern='^[a-z]+$',
+          tips='{\
+            "tips": "用户名不能为空",\
+            "patt": "用户名格式不正确"\
+          }')
 
+        input(name='password')
 
-    #messenger
-      .message.error
-        button(type='button', class='message-close') ×
-        .message-inner
-          | There was an explosion while processing your request.
+        input(required,
+          validate,
+          name='emall',
+          tips='{\
+            "tips": "邮箱不能为空"\
+          }')
+
+        button(type='button', class='submit') test
 
     script(src='./assets/scripts/libs/require.js')
     script(src='./assets/scripts/config.js')

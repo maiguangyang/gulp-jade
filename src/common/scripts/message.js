@@ -1,46 +1,41 @@
 
-define(() => {
+define(['jquery'], ($) => {
 
 
   let createMessage = (text, type, t) => {
-    let message     = document.body;
-    let parent      = document.createElement("div");
-    let child       = document.createElement("div");
-    let btn         = document.createElement("button");
-    let inner       = document.createElement("div");
-
-    let isMessage   = document.getElementById("messenger");
 
     let className   = type ? `message ${type}` : 'message';
+    let isMessage   = $('#messenger');
+    let html        = '';
 
-    parent.id       = 'messenger';
+    let item = `<div class='${className}'>
+        <button type='button' class='message-close'>×</button>
+        <div class='message-inner'>${text}</div>
+      </div>`
 
-    child.setAttribute('class', className);
+    if (0 < isMessage.length) {
+      html = item;
 
-
-    btn.setAttribute('type', 'button');
-    btn.setAttribute('class', 'message-close');
-    btn.innerHTML   = '×';
-    btn.onclick = function () {
-      this.parentNode.removeChild(this);
-      console.log(this.parentNode);
-    }
-
-    inner.setAttribute('class', 'message-inner');
-    inner.innerHTML = text;
-
-    parent.appendChild(child);
-    child.appendChild(btn);
-    child.appendChild(inner);
-
-    if (isMessage) {
-      isMessage.appendChild(child);
+      isMessage.append(html);
     }
     else {
-      message.appendChild(parent);
+      html = `<div id='messenger'>
+        ${item}
+      </div>`;
+
+      $('body').append(html);
     }
 
-    timeout(child, t);
+    timeout(t);
+
+    /**
+     * 点击关闭移除
+     */
+    $('.message-close').on('click', function(event) {
+      event.preventDefault();
+      let item = $('.message');
+      $(this).parent().remove();
+    });
   }
 
 
@@ -48,32 +43,31 @@ define(() => {
    * 出现、消失时间
    */
 
-  function timeout (item, t) {
+  function timeout (t) {
     let count = t ? t : 3;
-    let timeout = function (item, count) {
+    let timeout = function (count) {
       let timer = setTimeout(function () {
         if (0 >= count) {
-          // item.style.opacity = 0;
-          // item.parentNode.removeChild(item);
+          $('.message').eq(0).css('opacity', 0);
+          setTimeout(() => {
+            $('.message').eq(0).remove();
+          }, 500);
           clearTimeout(timer);
           return false;
         }
         else {
           count --;
-          timeout(item, count);
+          timeout(count);
         }
 
       }, 1000);
     }
-    timeout(item, count);
+    timeout(count);
   }
-
-
 
   /**
    * return
    */
-
   return createMessage;
 
 });

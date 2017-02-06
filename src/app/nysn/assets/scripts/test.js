@@ -8,7 +8,7 @@ define(['http'], (http) => {
     },
 
     get () {
-      http('http://www.test.com/common/sms', '', '', '', '', 3000, (res) => {
+      http('http://www.test.com/common/sms', '', '', '', '', 2000, (res) => {
         console.log(res);
       }, (err) => {
         console.log(err);

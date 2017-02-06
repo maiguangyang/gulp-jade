@@ -54,7 +54,7 @@ define(['jquery', 'message'], ($, createMessage) => {
         return success ? success(res) : function () {};
       })
       .error((err, errType) => {
-        createMessage(err.statusText || '请求失败...', 'error', 3);
+        createMessage(`Status: ${err.status} ${err.statusText}` || '请求失败...', 'error', 3);
         reset(url, type, data, dataType, headers, timeout, success, errFunc);
       });
     }
