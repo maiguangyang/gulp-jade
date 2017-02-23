@@ -72,12 +72,15 @@ gulp.task('jade', ['static'], () => {
 gulp.task('styles', () => {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
   del([`${outputPath.styles}/*.css`], {force: true});
+
+  let manifest = gulp.src(`${paths.dist}/${paths.fileName}`);
   return gulp.src(`${inputPath.styles}/*.scss`)
     .pipe(plumber())
     .pipe(concat({ext:'.css'}))                         //- 根据文件/文件夹名合并
     .pipe(sass( {outputStyle: 'expanded'}))             //- 输出样式格式
     .pipe(hash())                                       //- 文件名加MD5后缀
     .pipe(getVersion(rename({suffix: '.min'})))         //- master环境改名
+    .pipe(revReplace({manifest: manifest}))
     .pipe(getVersion(minifycss()))                      //- master环境压缩
     .pipe(gulp.dest(`${outputPath.styles}`))            //- 输出编译后的css文件
     .pipe(hash.manifest(`${paths.fileName}`))           //- JSON版本号
@@ -175,10 +178,16 @@ gulp.task('move', ['sprite', 'libs'], () => {
     .pipe(gulp.dest(`${outputPath.scripts}/libs/`));
 
     gulp.src([`${inputPath.styles}/components/assets/images/_sprites/*.png`])
-    .pipe(gulp.dest(`${outputPath.images}/_sprites/`));
+    .pipe(hash())
+    .pipe(gulp.dest(`${outputPath.images}/_sprites/`))
+    .pipe(hash.manifest(`${paths.fileName}`))
+    .pipe(gulp.dest(`${paths.dist}`));
 
     gulp.src([`${inputPath.images}/*.png`, `${inputPath.images}/*.jpg`])
-    .pipe(gulp.dest(`${outputPath.images}`));
+    .pipe(hash())
+    .pipe(gulp.dest(`${outputPath.images}`))
+    .pipe(hash.manifest(`${paths.fileName}`))
+    .pipe(gulp.dest(`${paths.dist}`));
 
 });
 
