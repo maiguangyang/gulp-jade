@@ -27,6 +27,7 @@ import minimist     from  'minimist'            //- 命令行参数解析
 import plumber      from  'gulp-plumber'        //监听错误
 import _            from  'lodash'              //lodash
 import fs           from  'fs'
+import autoprefixer from 'gulp-autoprefixer'
 
 import {
   ROOT_PATH,
@@ -77,6 +78,10 @@ gulp.task('styles', () => {
   return gulp.src(`${inputPath.styles}/*.scss`)
     .pipe(plumber())
     .pipe(concat({ext:'.css'}))                         //- 根据文件/文件夹名合并
+    .pipe(autoprefixer({
+        browsers: ['ie 6-8', 'Firefox <= 20', '> 5%', 'last 2 versions', 'iOS 7'],
+        cascade: false
+    }))
     .pipe(sass( {outputStyle: 'expanded'}))             //- 输出样式格式
     .pipe(hash())                                       //- 文件名加MD5后缀
     .pipe(getVersion(rename({suffix: '.min'})))         //- master环境改名
