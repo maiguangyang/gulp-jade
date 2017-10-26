@@ -25,6 +25,13 @@ $ cd /path/to/project
 $ npm install
 ```
 
+#### node-sass安装出错
+```
+$ 先针对安装gulp-sass、node-sass
+$ 然后运行npm rebuild node-sass
+
+```
+
 #### Nginx 配置文件导入
 
 ```
