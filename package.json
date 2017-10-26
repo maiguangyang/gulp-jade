@@ -40,5 +40,9 @@
     "node-sass": "^4.5.3",
     "path": "^0.12.7",
     "vinyl-buffer": "^1.0.0"
+  },
+  "dependencies": {
+    "gulp-sequence": "^0.4.6",
+    "gulp-watch": "^4.3.11"
   }
 }
