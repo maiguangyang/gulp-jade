@@ -11,8 +11,7 @@ import hash         from  'gulp-hash'           //- md5版本号
 import del          from  'del'                 //- 删除
 import revReplace   from  'gulp-rev-replace'    //- 路径替换
 import minifycss    from  'gulp-minify-css'     //- 压缩CSS
-import minifyHTML   from  'gulp-minify-html'    //- 压缩HTML
-
+import htmlmin      from  'gulp-htmlmin'    //- 压缩HTML
 
 import babel        from  'gulp-babel'          //- ES6
 import uglify       from  'gulp-uglify'         //- JS压缩
@@ -80,20 +79,20 @@ gulp.task('js', ['libs'], (cb) => {
 
 
 // Html文件函数
-function setHtml (url = `${inputPath.files}/*.jade`, path = '') {
+function setHtml (url = `${inputPath.files}/**/*.jade`, path = '') {
   if (_.isEmpty(options.name)) {console.log(proTips); return false;};
   let manifest = gulp.src(`${paths.dist}/${paths.fileName}`);
   return gulp.src(url)
   .pipe(jade({pretty: '\t'}))
   .pipe(plumber())
-  .pipe(getVersion(minifyHTML({comments:true, spare:true})))      //- master环境压缩文件
   .pipe(revReplace({manifest: manifest}))                         //- 执行文件内路径替换
+  .pipe(getVersion(htmlmin({collapseWhitespace: true})))      //- master环境压缩文件
   .pipe(gulp.dest(`${outputPath.files}`));                        //- 替换后的文件输出的目录
 }
 
 
 // Css文件函数
-function setStyles (url = `${inputPath.styles}/*.scss`, path = '') {
+function setStyles (url = `${inputPath.styles}/**/*.scss`, path = '') {
   let manifest = gulp.src(`${paths.dist}/${paths.fileName}`);
   return gulp.src(url)
   .pipe(plumber())
@@ -114,7 +113,7 @@ function setStyles (url = `${inputPath.styles}/*.scss`, path = '') {
 
 
 // Js文件函数
-function setScript (url = `${inputPath.scripts}/*.js`, path = '') {
+function setScript (url = `${inputPath.scripts}/**/*.js`, path = '') {
 
   return gulp.src(url)
   .pipe(plumber())
@@ -137,14 +136,21 @@ function setScript (url = `${inputPath.scripts}/*.js`, path = '') {
 gulp.task('watchStyles', ['css', 'js', 'html'], () => {
 
   // Html文件
-  let url = `${inputPath.files}/*.jade`;
+  let url = `${inputPath.files}/**/*.jade`;
   gulpWatch(url, watchOption, (file) => {
     let filePath = _.get(file, 'history');
     if (!_.isEmpty(filePath)) {
       let fileName = filePath[filePath.length - 1].replace(/\\/gi, '/');
       let path = fileName.match(/src(\S*)\//)[1];
 
-      setHtml(fileName, path);
+      let arr = fileName.split('/');
+      if (arr.indexOf('components') !== arr.length - 2) {
+        setHtml();
+      }
+      else {
+        setHtml(fileName, path);
+      }
+
     }
   });
 
@@ -155,27 +161,38 @@ gulp.task('watchStyles', ['css', 'js', 'html'], () => {
 
 
   // 样式文件
-  let cssUrl = `${inputPath.styles}/*.scss`;
+  let cssUrl = [`${inputPath.styles}/**/*.scss`, `${inputPath.common}/**/*.scss`];
   gulpWatch(cssUrl, (file) => {
     let filePath = _.get(file, 'history');
     if (!_.isEmpty(filePath)) {
       let fileName = filePath[filePath.length - 1].replace(/\\/gi, '/');
       let path = fileName.match(/src(\S*)\//)[1];
 
-      setStyles(fileName, path);
+      let arr = fileName.split('/');
+      if (-1 !== arr.indexOf('common')) {
+        setStyles();
+      }
+      else {
+        setStyles(fileName, path);
+      }
     }
   });
 
 
   // js文件
-  let jsUrl = `${inputPath.scripts}/*.js`;
+  let jsUrl = [`${inputPath.scripts}/**/*.js`, `${inputPath.common}/**/*.js`];
   gulpWatch(jsUrl, (file) => {
     let filePath = _.get(file, 'history');
     if (!_.isEmpty(filePath)) {
       let fileName = filePath[filePath.length - 1].replace(/\\/gi, '/');
       let path = fileName.match(/src(\S*)\//)[1];
-
-      setScript(fileName, path);
+      let arr = fileName.split('/');
+      if (-1 !== arr.indexOf('common')) {
+        setScript();
+      }
+      else {
+        setScript(fileName, path);
+      }
     }
   });
 
